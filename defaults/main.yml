@@ -1,0 +1,15 @@
+---
+jmx_exporter_version: 0.11.0
+jmx_exporter_xmx: 32m
+jmx_exporter_xms: 32m
+jmx_exporter_listen_addr: 0.0.0.0
+jmx_exporter_listen_port: 9404
+
+jmx_exporter_conf_start_delay: 0
+jmx_exporter_conf_remote_jmx: localhost:9998
+jmx_exporter_conf_lower_name: false
+jmx_exporter_conf_lower_label: false
+jmx_exporter_conf_whitelist: []
+jmx_exporter_conf_blacklist: []
+jmx_exporter_conf_rules:
+  - pattern: ".*"

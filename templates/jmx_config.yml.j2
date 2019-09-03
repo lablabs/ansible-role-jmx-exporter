@@ -1,0 +1,15 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+startDelaySeconds: {{ jmx_exporter_conf_start_delay }}
+{% if jmx_exporter_conf_remote_jmx is defined %}
+hostPort: {{ jmx_exporter_conf_remote_jmx }}
+{% endif %}
+lowercaseOutputName: {{ jmx_exporter_conf_lower_name }}
+lowercaseOutputLabelNames: {{ jmx_exporter_conf_lower_label }}
+{% if jmx_exporter_conf_whitelist is defined and jmx_exporter_conf_whitelist %}
+whitelistObjectNames: {{ jmx_exporter_conf_whitelist|list }}
+{% endif %}
+{% if jmx_exporter_conf_blacklist is defined and jmx_exporter_conf_blacklist %}
+blacklistObjectNames: {{ jmx_exporter_conf_blacklist|list }}
+{% endif %}
+rules:
+  {{ jmx_exporter_conf_rules | to_nice_yaml(indent=2) | indent(2,False) }}

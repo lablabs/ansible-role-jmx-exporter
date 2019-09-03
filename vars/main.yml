@@ -1,0 +1,48 @@
+---
+go_arch_map:
+  i386: '386'
+  x86_64: 'amd64'
+  aarch64: 'arm64'
+  armv7l: 'armv7'
+  armv6l: 'armv6'
+
+jmx_exporter_base_url: "https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_httpserver/"
+jmx_exporter_url: "{{ jmx_exporter_base_url }}{{ jmx_exporter_version }}/jmx_prometheus_httpserver-{{ jmx_exporter_version }}-jar-with-dependencies.jar"
+jmx_exporter_url_sha1: "{{ jmx_exporter_url }}.sha1"
+
+jmx_exporter_system_group: "jmx-exporter"
+jmx_exporter_system_user: "{{ jmx_exporter_system_group }}"
+
+jmx_exporter_root_directory: /opt/jmx_exporter
+jmx_exporter_file: "jmx_prometheus_httpserver-{{ jmx_exporter_version }}-jar-with-dependencies.jar"
+jmx_exporter_jar_path: "{{ jmx_exporter_root_directory }}/{{ jmx_exporter_file }}"
+
+jmx_exporter_conf_directory: /etc/jmx_exporter
+jmx_exporter_conf_file: "jmx_config.yml"
+jmx_exporter_conf_path: "{{ jmx_exporter_conf_directory }}/{{ jmx_exporter_conf_file }}"
+
+jmx_exporter_systemd:
+  - service_name: jmx_exporter.service
+    service_enabled: true
+    service_status: started
+    service_config:
+      Unit:
+          Description: Prometheus JMX Exporter
+          Wants: network-online.target
+          After: network-online.target
+      Service:
+          Type: simple
+          RuntimeDirectory: jmx_exporter
+          User: '{{ jmx_exporter_system_user }}'
+          Group: '{{ jmx_exporter_system_group }}'
+          ExecStart: |
+            /bin/sh -c "/usr/bin/java -Djava.awt.headless=true -Xmx{{ jmx_exporter_xmx }} -Xms{{ jmx_exporter_xms }} -cp {{ jmx_exporter_jar_path }} io.prometheus.jmx.WebServer {{ jmx_exporter_listen_addr }}:{{ jmx_exporter_listen_port }} {{ jmx_exporter_conf_path }}"
+          ExecStartPost: '/bin/sh -c "echo $MAINPID > /run/jmx_exporter/jmx_exporter.pid"'
+          ExecReload: '/bin/kill -HUP $MAINPID'
+          PIDFile: '/run/jmx_exporter/jmx_exporter.pid'
+          SyslogIdentifier: jmx_exporter
+          Restart: always
+          KillSignal: SIGTERM
+          SuccessExitStatus: 143
+      Install:
+          WantedBy: multi-user.target
