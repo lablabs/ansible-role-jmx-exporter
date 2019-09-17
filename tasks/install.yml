@@ -42,12 +42,13 @@
   delay: 2
   check_mode: false
 
-- name: Propagate jmx exporter binary
+- name: Deploy jmx exporter binary
   copy:
     src: "/tmp/{{ jmx_exporter_file }}"
     dest: "{{ jmx_exporter_jar_path }}"
     mode: 0750
     owner: "{{ jmx_exporter_system_user }}"
     group: "{{ jmx_exporter_system_group }}"
+    remote_src: "true"
   notify: restart jmx_exporter
   when: not ansible_check_mode
